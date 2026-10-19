@@ -1,0 +1,32 @@
+{
+  "manifest_version": 2,
+  "name": "Onshape AutoLogin",
+  "version": "1.0.0",
+  "description": "Automatically signs you back in to Onshape.",
+  "permissions": ["storage"],
+  "content_scripts": [
+    {
+      "matches": ["https://cad.onshape.com/*", "https://*.onshape.com/signin*"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "icons": {
+    "48": "icon.svg",
+    "96": "icon.svg"
+  },
+  "browser_action": {
+    "default_icon": "icon.svg",
+    "default_title": "Onshape AutoLogin",
+    "default_popup": "options.html"
+  },
+  "options_ui": {
+    "page": "options.html"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "onshape-autologin@pioneerswine996",
+      "data_collection_permissions": { "required": ["none"] }
+    }
+  }
+}
