@@ -1,0 +1,47 @@
+# Push a tag like v1.1.0 (matching manifest.json "version") to sign the add-on
+# as unlisted on addons.mozilla.org and publish it as a GitHub Release.
+# Needs repo secrets AMO_API_KEY and AMO_API_SECRET.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check tag matches manifest version
+        run: |
+          version=$(jq -r .version manifest.json)
+          if [ "${GITHUB_REF_NAME#v}" != "$version" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match manifest version $version"
+            exit 1
+          fi
+
+      - name: Sign with Mozilla (unlisted)
+        env:
+          WEB_EXT_API_KEY: ${{ secrets.AMO_API_KEY }}
+          WEB_EXT_API_SECRET: ${{ secrets.AMO_API_SECRET }}
+        run: |
+          npx --yes web-ext@10.8.0 sign --channel=unlisted --artifacts-dir dist
+          mv dist/*.xpi onshape-autologin.xpi
+
+      # Installed copies poll this file (manifest "update_url") for new versions.
+      - name: Write updates.json
+        run: |
+          jq -n \
+            --arg id "$(jq -r .browser_specific_settings.gecko.id manifest.json)" \
+            --arg version "${GITHUB_REF_NAME#v}" \
+            --arg link "https://github.com/$GITHUB_REPOSITORY/releases/download/$GITHUB_REF_NAME/onshape-autologin.xpi" \
+            '{addons: {($id): {updates: [{version: $version, update_link: $link}]}}}' > updates.json
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" onshape-autologin.xpi updates.json --generate-notes

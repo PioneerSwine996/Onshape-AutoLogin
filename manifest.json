@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Onshape AutoLogin",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Automatically signs you back in to Onshape.",
   "permissions": ["storage"],
   "content_scripts": [
@@ -26,6 +26,7 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "onshape-autologin@pioneerswine996",
+      "update_url": "https://github.com/PioneerSwine996/Onshape-AutoLogin/releases/latest/download/updates.json",
       "data_collection_permissions": { "required": ["none"] }
     }
   }

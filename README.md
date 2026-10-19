@@ -4,13 +4,30 @@ A Firefox extension that fills in and submits the Onshape sign-in form for you.
 
 ## Install
 
-1. Open `about:debugging#/runtime/this-firefox`
-2. Click **Load Temporary Add-on…** and pick `manifest.json`
-3. Click the Extensions (puzzle piece) button in the toolbar → **Onshape AutoLogin**, then enter your email and password and click **Save**. Right-click it → **Pin to Toolbar** to keep the key icon visible.
+1. Open **https://github.com/PioneerSwine996/Onshape-AutoLogin/releases/latest/download/onshape-autologin.xpi** in Firefox and click **Allow**, then **Add**.
+2. Click the Extensions (puzzle piece) button in the toolbar → **Onshape AutoLogin**, then enter your email and password and click **Save**. Right-click it → **Pin to Toolbar** to keep the key icon visible.
 
-A temporary add-on is removed when Firefox restarts. To keep it installed, either:
-- sign it as an unlisted add-on at addons.mozilla.org (free; `npx web-ext sign`), or
-- use Firefox Developer Edition/Nightly, set `xpinstall.signatures.required` to `false` in `about:config`, and install a zip of this folder.
+Firefox checks for new versions and updates it automatically.
+
+### For development
+
+Open `about:debugging#/runtime/this-firefox` → **Load Temporary Add-on…** → pick `manifest.json`. It's removed when Firefox restarts.
+
+## Releasing
+
+One-time setup: create API credentials at https://addons.mozilla.org/developers/addon/api/key/ and add them as repo secrets:
+
+```sh
+gh secret set AMO_API_KEY
+gh secret set AMO_API_SECRET
+```
+
+For each release:
+
+1. Bump `"version"` in `manifest.json` (Mozilla rejects a version it has already signed) and commit.
+2. Tag and push: `git tag v1.2.0 && git push origin main v1.2.0`
+
+The Release workflow signs the add-on as unlisted, then publishes a GitHub Release with `onshape-autologin.xpi` and `updates.json`. Lint locally with `npx web-ext lint --self-hosted`.
 
 ## Notes
 
